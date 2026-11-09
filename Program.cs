@@ -1,8 +1,9 @@
- using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Raceway.Data;
 using Raceway.Models;
 using Raceway.Models.Interface;
+using Raceway.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,10 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddScoped<IProfileImageService, ProfileImageService>();
+
+// Azure Blob Storage for event banner images (videos 2, 3, 10).
+// The connection string is NOT in source control: user-secrets locally, AzureStorage__ConnectionString in Docker.
+builder.Services.AddSingleton<IBlobStorageService, BlobStorageService>();
 
 builder.Services.AddControllersWithViews();
 
@@ -40,8 +45,8 @@ using (var scope = app.Services.CreateScope())
 
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-    String email = "admin@icloud.com";
-    String password = "Admin1234@";
+    String email = "admin@admin.com";
+    String password = "Admin12@";
 
     if(await userManager.FindByEmailAsync(email) == null)
     {
@@ -71,7 +76,6 @@ else
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
